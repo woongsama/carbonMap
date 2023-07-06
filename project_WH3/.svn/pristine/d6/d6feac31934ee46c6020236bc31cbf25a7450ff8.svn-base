@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="servlet">
+
+	<!-- test query -->
+	<select id="serVletTest" resultType="EgovMap">
+		<![CDATA[
+			select sd_cd from tl_sd limit 1
+		]]>
+	</select>
+	<select id="realTest" resultType="EgovMap">
+		<![CDATA[
+			select * from tl_sd limit 1
+		]]>
+	</select>
+	
+	<!-- 시도 이름 반환 -->
+	<select id="get_sd_nm" resultType="sgg">
+			select sd_nm, sd_cd from tl_sd
+	</select>
+	
+	<!-- 시군구 이름 반환 -->
+	<select id="select_sgg_nm" parameterType="String" resultType="sgg">
+			select distinct sgg_nm from view_search_sd_c where sd_nm = '${sd_nm}'
+	</select>
+	
+	<!-- 시군구 코드 반환 -->
+	<select id="get_sgg_cd" parameterType="String" resultType="sgg">
+			select distinct sgg_cd from view_search_sgg_c_real where sigungu_nm ='${sgg_nm}'
+	</select>
+	
+	<select id="get_center" parameterType="sgg" resultType="sgg">
+			select sd_nm, ST_X(ST_Centroid(geom)) as gps_x, ST_Y(ST_Centroid(geom)) as gps_y from tl_sd where sd_nm='${sd_nm}'
+	</select>
+	
+	<select id="get_center_sgg" parameterType="sgg" resultType="sgg">
+			select sigungu_nm, ST_X(ST_Centroid(geom)) as gps_x, ST_Y(ST_Centroid(geom)) as gps_y from view_search_sgg_c_real where sigungu_nm='${sgg_nm}'
+	</select>
+	
+	<!-- 시도 검색시, 범례 반환 -->
+	<select id="get_legend" parameterType="sgg" resultType="sgg">
+		select unnest(cdb_jenksbins(array_agg(sgg_usage),#{sgg_count})) as val from view_search_sd_c where sd_nm='${sd_nm}'
+	</select>
+	
+	<!-- 시도 전체 검색시, 범례 반환 -->
+	<select id="get_legend_sd_all" resultType="sgg">
+		select unnest(cdb_jenksbins(array_agg(sd_usage),5)) as val from view_search_sd_all_c
+	</select>
+	
+	<!-- 법정동 갯수 반환 -->
+	<select id="return_bjd_cnt" parameterType="String" resultType="int">
+		select count(*) from tl_bjd where sgg_cd=#{sgg_cd}
+	</select>
+	
+	<!-- 법정동 범례 반환 -->
+	<select id="get_legend_bjd" parameterType="sgg" resultType="sgg">
+		select unnest(cdb_jenksbins(array_agg(bjd_usage),5)) as bjd_legend_val from view_search_sgg_c where sgg_cd=#{sgg_cd}
+	</select>
+	
+	<!-- 시도 정보(시도이름, 시도별 사용량) / 사용테이블 'view_search_sd_all_c' -->
+	<select id="get_sd_inform" resultType="sgg">
+		select sd_nm, sd_usage from view_search_sd_all_c
+	</select>
+	
+	<!-- 시군구 정보(시군구 사용량) / 사용테이블 'view_search_sd_c' -->
+	<select id="get_sgg_inform" parameterType="sgg" resultType="sgg">
+		select sgg_nm, sgg_usage from view_search_sd_c where sd_nm='${sd_nm}'
+	</select>
+	
+</mapper>

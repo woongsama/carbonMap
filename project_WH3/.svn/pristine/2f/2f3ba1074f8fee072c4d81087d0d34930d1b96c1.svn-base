@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- mapper 파일 찾아오지못함, servlet-SQL.xml에 작성 -->
+
+<mapper namespace="sggns">
+
+	<select id="select_sgg_nm" parameterType="String" resultType="sgg">
+			select sgg_nm from tl_sgg where sd_nm='#{sd_nm}'
+	</select>
+	
+</mapper>
